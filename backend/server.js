@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 import cors from 'cors';
 import { connectDb } from './database/connectDb.js';
-import { errorMiddleware } from './middleware/errorMiddleware.js';
+import { errorHandler } from './middleware/errorHandler.js';
 import userRoutes from './routes/userRoutes.js';
 
 // dotenv config
@@ -16,10 +16,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
-app.use(errorMiddleware);
 
 // Routes
 app.use('/api/users', userRoutes);
+
+// Error middleware
+app.use(errorHandler);
 
 // Define port
 const PORT = process.env.PORT || 3005;
