@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { generateToken } from '../utils/generateToken.js';
 
 const getUsers = asyncHandler(async (req, res) => {
   res.json('Get users controller');
@@ -84,12 +84,5 @@ const loginUser = asyncHandler(async (req, res) => {
     }
   }
 });
-
-// Generate token
-const generateToken = userId => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-};
 
 export { getUsers, registerUser, loginUser };
