@@ -21,9 +21,8 @@ const registerUser = asyncHandler(async (req, res) => {
   const userExists = await User.findOne({ email });
 
   if (userExists) {
-    res.status(400).json({
-      message: 'User already exists',
-    });
+    res.status(400);
+    throw new Error('User already exists');
   } else {
     // Hash Password
     const salt = await bcrypt.genSalt(10);
@@ -48,15 +47,42 @@ const registerUser = asyncHandler(async (req, res) => {
         message: 'User created successfully',
       });
     } else {
-      res.status(400).json({
-        message: 'Invalid user data',
-      });
+      res.status(400);
+      throw new Error('Invalid user data');
     }
   }
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  res.json('Login user controller');
+  const { email, password } = req.body;
+
+  // Find the user
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404).json({
+      message: 'User not found',
+    });
+  } else {
+    // Compare user password to the password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (isMatch) {
+      const token = generateToken(user._id);
+
+      res.status(200).json({
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          token,
+        },
+      });
+    } else {
+      res.status(401);
+      throw new Error('Invalid user credentials');
+    }
+  }
 });
 
 // Generate token
