@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const getUsers = asyncHandler(async (req, res) => {
   res.json('Get users controller');
@@ -42,6 +43,7 @@ const registerUser = asyncHandler(async (req, res) => {
           id: newUser._id,
           name: newUser.name,
           email: newUser.email,
+          token: generateToken(newUser._id),
         },
         message: 'User created successfully',
       });
@@ -56,5 +58,12 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   res.json('Login user controller');
 });
+
+// Generate token
+const generateToken = userId => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
 
 export { getUsers, registerUser, loginUser };
